@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DrinkWater</title>
+<meta name="description" content="Lembrar. Registrar. Acompanhar.">
+<meta name="theme-color" content="#1e88e5">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Primeiro acesso -->
+<div id="onboarding" class="onboarding" role="dialog" aria-modal="true" aria-labelledby="ob-title" hidden>
+  <div class="ob-card">
+    <section data-step="0">
+      <div class="ob-emoji" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5s6.5 6.6 6.5 11a6.5 6.5 0 0 1-13 0c0-4.4 6.5-11 6.5-11Z"/></svg></div>
+      <h1 id="ob-title">Bem-vindo ao DrinkWater 💧</h1>
+      <p>Organize seus registros e acompanhe seu hábito de beber água ao longo do dia.</p>
+    </section>
+    <section data-step="1" hidden>
+      <h2>Como podemos chamar você?</h2>
+      <label for="ob-name">Seu nome</label>
+      <input id="ob-name" type="text" maxlength="30" autocomplete="given-name">
+    </section>
+    <section data-step="2" hidden>
+      <h2>Defina sua meta diária pessoal</h2>
+      <p>Defina uma meta pessoal para acompanhar seu consumo diário. O valor abaixo é só um exemplo e você pode alterá-lo quando quiser.</p>
+      <div class="row" role="group" aria-label="Unidade de medida">
+        <button class="btn ghost" data-unit="ml">ml</button>
+        <button class="btn ghost" data-unit="cups">Copos</button>
+      </div>
+      <details class="ml-help"><summary>O que é ml?</summary><p class="hint">ml quer dizer mililitro, a medida usada para líquidos. 1 litro tem 1.000 ml, e um copo comum tem cerca de 200 ml. Se preferir, toque em “Copos”.</p></details>
+      <label for="ob-goal" id="ob-goal-label">Quantidade em ml</label>
+      <input id="ob-goal" type="number" inputmode="numeric" min="500" max="10000" step="50" value="2000">
+    </section>
+    <section data-step="3" hidden>
+      <h2>Deseja receber lembretes?</h2>
+      <p>Quer receber lembretes para não esquecer de registrar sua água?</p>
+      <div class="row">
+        <button class="btn" data-remind="yes">Sim</button>
+        <button class="btn ghost" data-remind="no">Não</button>
+      </div>
+      <p id="ob-remind-msg" class="hint" role="status"></p>
+    </section>
+    <section data-step="4" hidden>
+      <div class="ob-emoji" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.8 2.8L16 9.5"/></svg></div>
+      <h2>Tudo pronto!</h2>
+      <p>Seu DrinkWater está configurado.</p>
+    </section>
+    <div class="row ob-actions">
+      <button id="ob-back" class="btn ghost" hidden>Voltar</button>
+      <button id="ob-next" class="btn">Continuar</button>
+    </div>
+    <p class="hint small">O DrinkWater é uma ferramenta de organização pessoal e não substitui orientação de profissionais de saúde.</p>
+  </div>
+</div>
+
+<div class="app">
+  <nav class="nav" aria-label="Navegação principal">
+    <div class="brand"><img src="icons/icon.svg" alt="" width="32" height="32"><span>DrinkWater</span></div>
+    <button data-view="home" aria-current="page"><span aria-hidden="true"><svg class="ico" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/></svg></span><b>Início</b></button>
+    <button data-view="register"><span aria-hidden="true"><svg class="ico" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5s6.5 6.6 6.5 11a6.5 6.5 0 0 1-13 0c0-4.4 6.5-11 6.5-11Z"/></svg></span><b>Registrar</b></button>
+    <button data-view="history"><span aria-hidden="true"><svg class="ico" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20v-8M12 20V5M19 20v-5"/></svg></span><b>Histórico</b></button>
+    <button data-view="settings"><span aria-hidden="true"><svg class="ico" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></span><b>Ajustes</b></button>
+  </nav>
+
+  <main id="main" tabindex="-1">
+    <!-- Início -->
+    <section id="view-home" class="view">
+      <header class="top">
+        <h1>DrinkWater</h1>
+        <p id="greeting" class="sub">Cuide da sua hidratação ao longo do dia.</p>
+      </header>
+      <div class="card hero">
+        <div class="ring" role="img" id="ring-label">
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="ring-bg" cx="60" cy="60" r="52"/>
+            <circle id="ring-fg" class="ring-fg" cx="60" cy="60" r="52"/>
+          </svg>
+          <div class="ring-text"><strong id="pct">0%</strong><span id="amounts">0 ml / 2.000 ml</span></div>
+        </div>
+        <p id="motivation" class="motivation" role="status">Cada registro ajuda você a acompanhar melhor seu dia.</p>
+        <p class="hint">Meta pessoal definida pelo usuário.</p>
+        <div class="row quick-home">
+          <button class="btn ghost" data-add="200">+ 200 ml</button>
+          <button class="btn ghost" data-add="300">+ 300 ml</button>
+          <button class="btn ghost" data-add="500">+ 500 ml</button>
+        </div>
+        <div class="row center">
+          <button class="btn" data-goto="register">+ Registrar água</button>
+          <button id="undo-home" class="btn ghost">Desfazer último</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Registros de hoje</h2>
+        <div id="today-list"></div>
+      </div>
+    </section>
+
+    <!-- Registrar -->
+    <section id="view-register" class="view" hidden>
+      <header class="top"><h1>Registrar água</h1><p class="sub">Toque para adicionar ao seu dia.</p></header>
+      <div class="card">
+        <div class="row" role="group" aria-label="Unidade de medida">
+        <button class="btn ghost" data-unit="ml">ml</button>
+        <button class="btn ghost" data-unit="cups">Copos</button>
+      </div>
+        <p id="unit-note" class="hint"></p>
+        <details class="ml-help"><summary>O que é ml?</summary><p class="hint">ml quer dizer mililitro, a medida usada para líquidos. 1 litro tem 1.000 ml, e um copo comum tem cerca de 200 ml. Se preferir, toque em “Copos”.</p></details>
+        <div class="quick">
+          <button class="btn big" data-add="200"><svg class="ico drop" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5s6.5 6.6 6.5 11a6.5 6.5 0 0 1-13 0c0-4.4 6.5-11 6.5-11Z"/></svg>+ 200 ml</button>
+          <button class="btn big" data-add="300"><svg class="ico drop" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5s6.5 6.6 6.5 11a6.5 6.5 0 0 1-13 0c0-4.4 6.5-11 6.5-11Z"/></svg>+ 300 ml</button>
+          <button class="btn big" data-add="500"><svg class="ico drop" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5s6.5 6.6 6.5 11a6.5 6.5 0 0 1-13 0c0-4.4 6.5-11 6.5-11Z"/></svg>+ 500 ml</button>
+        </div>
+        <h2>Adicionar quantidade personalizada</h2>
+        <div class="row">
+          <div class="grow">
+            <label for="custom-amount" id="custom-label">Quantidade em ml</label>
+            <input id="custom-amount" type="number" inputmode="numeric" min="1" max="5000" placeholder="Ex.: 350">
+          </div>
+          <button id="add-custom" class="btn">Adicionar</button>
+        </div>
+        <p id="custom-error" class="error" role="alert"></p>
+        <button id="undo-reg" class="btn ghost">Desfazer último registro</button>
+      </div>
+      <p class="hint">Hoje: <strong id="reg-total">0 ml</strong></p>
+    </section>
+
+    <!-- Histórico -->
+    <section id="view-history" class="view" hidden>
+      <header class="top"><h1>Histórico</h1><p class="sub">Seus registros, apenas como acompanhamento.</p></header>
+      <div class="card">
+        <h2>Últimos 7 dias</h2>
+        <div id="chart" class="chart" role="img" aria-label="Gráfico de barras dos últimos 7 dias"></div>
+        <p class="hint small">A linha tracejada indica sua meta pessoal.</p>
+      </div>
+      <div class="card">
+        <h2>Estatísticas</h2>
+        <div id="stats" class="stats"></div>
+      </div>
+      <div class="card">
+        <h2>Registros por data</h2>
+        <label for="date-pick">Escolha uma data</label>
+        <input id="date-pick" type="date">
+        <div id="day-detail"></div>
+        <div class="rec-form">
+          <h3 id="rec-title">Adicionar registro nesta data</h3>
+          <div class="row">
+            <div class="grow"><label for="rec-time">Horário</label><input id="rec-time" type="time"></div>
+            <div class="grow"><label for="rec-amount" id="rec-amount-label">Quantidade em ml</label><input id="rec-amount" type="number" inputmode="numeric" min="1" max="5000" placeholder="Ex.: 250"></div>
+          </div>
+          <p id="rec-error" class="error" role="alert"></p>
+          <div class="row">
+            <button id="rec-save" class="btn">Adicionar registro</button>
+            <button id="rec-cancel" class="btn ghost" hidden>Cancelar edição</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Dias anteriores</h2>
+        <div id="days-list"></div>
+      </div>
+    </section>
+
+    <!-- Configurações -->
+    <section id="view-settings" class="view" hidden>
+      <header class="top"><h1>Configurações</h1></header>
+      <div class="card">
+        <h2>Perfil</h2>
+        <label for="set-name">Nome ou apelido</label>
+        <input id="set-name" type="text" maxlength="30">
+        <label for="set-goal" id="set-goal-label">Meta diária (ml)</label>
+        <input id="set-goal" type="number" inputmode="numeric" min="500" max="10000" step="50">
+        <p class="hint">Meta pessoal definida pelo usuário. A necessidade de hidratação pode variar de pessoa para pessoa.</p>
+      </div>
+      <div class="card">
+        <h2>Lembretes de hidratação</h2>
+        <label class="switch"><input id="set-remind" type="checkbox" role="switch"><span>Ativar lembretes</span></label>
+        <div class="grid3">
+          <div><label for="set-start">Início</label><input id="set-start" type="time"></div>
+          <div><label for="set-end">Fim</label><input id="set-end" type="time"></div>
+          <div><label for="set-interval">Intervalo (min)</label><input id="set-interval" type="number" inputmode="numeric" min="15" max="480" step="5"></div>
+        </div>
+        <p id="notif-status" class="hint" role="status"></p>
+        <button id="test-notif" class="btn ghost">Enviar lembrete de teste</button>
+      </div>
+      <div class="card">
+        <h2>Aparência</h2>
+        <div class="row">
+          <button class="btn ghost" data-theme="light"><svg class="ico" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"/></svg> Tema claro</button>
+          <button class="btn ghost" data-theme="dark"><svg class="ico" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5Z"/></svg> Tema escuro</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Unidade de medida</h2>
+        <div class="row" role="group" aria-label="Unidade de medida">
+        <button class="btn ghost" data-unit="ml">ml</button>
+        <button class="btn ghost" data-unit="cups">Copos</button>
+      </div>
+        <details class="ml-help"><summary>O que é ml?</summary><p class="hint">ml quer dizer mililitro, a medida usada para líquidos. 1 litro tem 1.000 ml, e um copo comum tem cerca de 200 ml. Se preferir, toque em “Copos”.</p></details>
+      </div>
+      <div class="card">
+        <h2>Dados</h2>
+        <p class="hint">Seus registros são armazenados localmente neste dispositivo.</p>
+        <p id="storage-status" class="hint"></p>
+        <div class="row">
+          <button id="export-csv" class="btn ghost">Exportar CSV</button>
+          <button id="export-json" class="btn ghost">Exportar JSON</button>
+          <button id="import-json" class="btn ghost">Importar backup</button>
+          <button id="export-recovery" class="btn ghost" hidden>Baixar cópia de recuperação</button>
+          <input id="import-file" type="file" accept=".json,application/json" hidden>
+          <button id="wipe" class="btn danger">Apagar todos os dados</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Aplicativo</h2>
+        <button id="install" class="btn" hidden>Instalar aplicativo</button>
+        <p id="install-info" class="hint"></p>
+        <p class="hint">DrinkWater é um Progressive Web App (PWA): funciona no navegador, pode ser instalado e abre mesmo sem internet. É uma ferramenta de organização pessoal, não médica.</p>
+        <p class="hint">Lembrar. Registrar. Acompanhar.</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<dialog id="confirm" aria-labelledby="confirm-msg">
+  <p id="confirm-msg"></p>
+  <div class="row">
+    <button id="confirm-no" class="btn ghost">Cancelar</button>
+    <button id="confirm-yes" class="btn danger">Confirmar</button>
+  </div>
+</dialog>
+
+<script src="js/app.js"></script>
+</body>
+</html>
